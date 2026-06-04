@@ -1,0 +1,2168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FitPulse — Transform Your Fitness Journey</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --ink: #0a0a0f;
+    --ink-soft: #1a1a24;
+    --surface: #12121a;
+    --surface-2: #1e1e2e;
+    --border: rgba(255,255,255,0.07);
+    --lime: #c8f135;
+    --lime-dim: #a8d020;
+    --cyan: #35f1f1;
+    --magenta: #f135b4;
+    --text: #e8e8f0;
+    --text-muted: #7a7a90;
+    --text-dim: #4a4a60;
+    --radius: 16px;
+    --radius-sm: 10px;
+    --shadow: 0 24px 64px rgba(0,0,0,0.5);
+    --glow-lime: 0 0 40px rgba(200,241,53,0.25);
+    --glow-cyan: 0 0 40px rgba(53,241,241,0.2);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; font-size: 16px; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--ink);
+    color: var(--text);
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--ink); }
+  ::-webkit-scrollbar-thumb { background: var(--lime); border-radius: 2px; }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 900;
+    padding: 0 5%;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background 0.4s, backdrop-filter 0.4s, border-color 0.4s;
+    border-bottom: 1px solid transparent;
+  }
+
+  nav.scrolled {
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(20px);
+    border-color: var(--border);
+  }
+
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 2px;
+    color: var(--lime);
+    text-decoration: none;
+  }
+
+  .nav-logo span { color: var(--text); }
+
+  .nav-links {
+    display: flex;
+    list-style: none;
+    gap: 2.5rem;
+    align-items: center;
+  }
+
+  .nav-links a {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    transition: color 0.2s;
+    position: relative;
+  }
+
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 0;
+    width: 0; height: 1px;
+    background: var(--lime);
+    transition: width 0.3s;
+  }
+
+  .nav-links a:hover { color: var(--lime); }
+  .nav-links a:hover::after { width: 100%; }
+
+  .nav-cta {
+    background: var(--lime);
+    color: var(--ink) !important;
+    padding: 9px 22px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.85rem !important;
+    letter-spacing: 0.02em;
+    transition: all 0.2s !important;
+  }
+
+  .nav-cta:hover {
+    background: #fff !important;
+    transform: translateY(-1px);
+    box-shadow: var(--glow-lime);
+  }
+
+  .nav-cta::after { display: none !important; }
+
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 4px;
+    background: none;
+    border: none;
+  }
+
+  .hamburger span {
+    display: block;
+    width: 24px; height: 2px;
+    background: var(--text);
+    transition: all 0.3s;
+    border-radius: 2px;
+  }
+
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    padding: 120px 5% 80px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 70% 40%, rgba(200,241,53,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 60% at 20% 80%, rgba(53,241,241,0.06) 0%, transparent 50%),
+      radial-gradient(ellipse 50% 40% at 80% 90%, rgba(241,53,180,0.05) 0%, transparent 50%),
+      linear-gradient(160deg, #0a0a0f 0%, #0f0f1a 50%, #0a0a12 100%);
+  }
+
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 80%);
+  }
+
+  .hero-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+  }
+
+  .hero-orb-1 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(200,241,53,0.12), transparent);
+    top: -100px; right: 10%;
+    animation: float1 8s ease-in-out infinite;
+  }
+
+  .hero-orb-2 {
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(53,241,241,0.1), transparent);
+    bottom: 10%; left: 5%;
+    animation: float2 10s ease-in-out infinite;
+  }
+
+  @keyframes float1 {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-30px) scale(1.05); }
+  }
+
+  @keyframes float2 {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(20px) scale(0.95); }
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 700px;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(200,241,53,0.08);
+    border: 1px solid rgba(200,241,53,0.2);
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--lime);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .hero-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--lime);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.3); }
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3.5rem, 9vw, 7.5rem);
+    line-height: 0.95;
+    letter-spacing: 2px;
+    margin-bottom: 28px;
+  }
+
+  .hero-title span {
+    display: block;
+    -webkit-text-stroke: 2px var(--lime);
+    color: transparent;
+  }
+
+  .hero-desc {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    max-width: 520px;
+    margin-bottom: 44px;
+    line-height: 1.75;
+    font-weight: 300;
+  }
+
+  .hero-btns {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: var(--lime);
+    color: var(--ink);
+    padding: 14px 32px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.25s;
+    letter-spacing: 0.02em;
+  }
+
+  .btn-primary:hover {
+    background: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(200,241,53,0.35);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text);
+    padding: 14px 32px;
+    border-radius: 50px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--border);
+    transition: all 0.25s;
+  }
+
+  .btn-secondary:hover {
+    border-color: rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.05);
+    transform: translateY(-2px);
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 40px;
+    margin-top: 64px;
+    flex-wrap: wrap;
+  }
+
+  .hero-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .hero-stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    color: var(--lime);
+    line-height: 1;
+  }
+
+  .hero-stat-label {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .hero-visual {
+    position: absolute;
+    right: 5%;
+    top: 50%;
+    transform: translateY(-50%);
+    display: grid;
+    gap: 16px;
+    z-index: 2;
+  }
+
+  /* ── SECTION BASE ── */
+  section { padding: 100px 5%; }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--lime);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label::before {
+    content: '';
+    width: 32px; height: 1px;
+    background: var(--lime);
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    letter-spacing: 1px;
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+
+  .section-desc {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    max-width: 540px;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  .section-header {
+    margin-bottom: 64px;
+  }
+
+  /* ── FEATURES ── */
+  #features { background: var(--surface); }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .feature-card {
+    background: var(--surface);
+    padding: 40px 36px;
+    transition: background 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(200,241,53,0.04), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .feature-card:hover { background: var(--surface-2); }
+  .feature-card:hover::before { opacity: 1; }
+
+  .feature-icon {
+    font-size: 2.2rem;
+    margin-bottom: 20px;
+    display: block;
+    filter: grayscale(0.3);
+  }
+
+  .feature-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+
+  .feature-desc {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  .feature-tag {
+    display: inline-block;
+    margin-top: 20px;
+    font-size: 0.72rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--lime);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    background: rgba(200,241,53,0.06);
+    border-radius: 4px;
+    border: 1px solid rgba(200,241,53,0.15);
+  }
+
+  /* ── SCREENS ── */
+  #screens { background: var(--ink); overflow: hidden; }
+
+  .screens-wrap {
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    margin-top: 64px;
+  }
+
+  .phone-mockup {
+    width: 220px;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .phone-mockup.center {
+    transform: translateY(-30px) scale(1.08);
+  }
+
+  .phone-frame {
+    background: #1a1a2e;
+    border-radius: 36px;
+    border: 2px solid rgba(255,255,255,0.12);
+    overflow: hidden;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
+    position: relative;
+  }
+
+  .phone-notch {
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 80px; height: 20px;
+    background: #0a0a0f;
+    border-radius: 0 0 16px 16px;
+    z-index: 5;
+  }
+
+  .phone-screen {
+    padding: 28px 16px 20px;
+    min-height: 420px;
+    font-size: 0.7rem;
+  }
+
+  /* Dashboard Screen */
+  .screen-dashboard { background: linear-gradient(160deg, #0f0f1e, #151525); }
+
+  .screen-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-top: 8px;
+  }
+
+  .screen-greeting { font-size: 0.6rem; color: #666; }
+  .screen-name { font-size: 0.85rem; font-weight: 600; color: #fff; margin-top: 2px; }
+
+  .screen-avatar {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--lime), var(--cyan));
+    border-radius: 50%;
+  }
+
+  .screen-hero-card {
+    background: linear-gradient(135deg, rgba(200,241,53,0.15), rgba(53,241,241,0.08));
+    border: 1px solid rgba(200,241,53,0.2);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .screen-card-label { font-size: 0.55rem; color: var(--lime); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+  .screen-card-val { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: #fff; line-height: 1; }
+  .screen-card-sub { font-size: 0.55rem; color: #888; margin-top: 4px; }
+
+  .screen-mini-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .screen-mini-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 12px;
+  }
+
+  .screen-mini-icon { font-size: 1rem; margin-bottom: 4px; }
+  .screen-mini-val { font-size: 0.85rem; font-weight: 600; color: #fff; }
+  .screen-mini-label { font-size: 0.5rem; color: #666; margin-top: 2px; }
+
+  .screen-bar-wrap { margin-bottom: 8px; }
+  .screen-bar-label { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .screen-bar-title { font-size: 0.55rem; color: #999; }
+  .screen-bar-val { font-size: 0.55rem; color: var(--lime); }
+  .screen-bar-track { height: 4px; background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden; }
+  .screen-bar-fill { height: 100%; border-radius: 2px; transition: width 1s ease; }
+
+  /* Workout Screen */
+  .screen-workout { background: linear-gradient(160deg, #0f1a0f, #111e11); }
+
+  .workout-header { text-align: center; padding: 12px 0 20px; }
+  .workout-timer { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; color: var(--lime); line-height: 1; }
+  .workout-timer-label { font-size: 0.5rem; color: #666; text-transform: uppercase; letter-spacing: 0.1em; }
+
+  .exercise-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .exercise-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .exercise-item.active { background: rgba(200,241,53,0.08); border-color: rgba(200,241,53,0.2); }
+  .ex-icon { font-size: 1.1rem; }
+  .ex-name { font-size: 0.65rem; font-weight: 500; color: #ddd; }
+  .ex-sets { font-size: 0.55rem; color: #666; margin-top: 2px; }
+  .ex-check { margin-left: auto; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 0.5rem; }
+  .ex-check.done { background: var(--lime); border-color: var(--lime); color: var(--ink); }
+
+  /* Progress Screen */
+  .screen-progress { background: linear-gradient(160deg, #0f0f1f, #1a0f1f); }
+
+  .progress-chart-wrap { margin: 16px 0; }
+  .chart-label { font-size: 0.55rem; color: #666; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  .mini-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+    height: 60px;
+  }
+
+  .chart-bar {
+    flex: 1;
+    border-radius: 4px 4px 0 0;
+    background: rgba(200,241,53,0.15);
+    transition: background 0.2s;
+    min-width: 12px;
+  }
+
+  .chart-bar.highlight { background: var(--lime); }
+
+  .ring-stats {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 16px;
+  }
+
+  .ring-stat {
+    text-align: center;
+  }
+
+  .ring {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    margin: 0 auto 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .ring-1 { background: conic-gradient(var(--lime) 78%, rgba(255,255,255,0.07) 0); }
+  .ring-2 { background: conic-gradient(var(--cyan) 60%, rgba(255,255,255,0.07) 0); }
+  .ring-3 { background: conic-gradient(var(--magenta) 91%, rgba(255,255,255,0.07) 0); }
+
+  .ring-name { font-size: 0.5rem; color: #666; }
+
+  .phone-label {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── BENEFITS / COUNTER ── */
+  #benefits { background: var(--surface); }
+
+  .benefits-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .counters-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .counter-cell {
+    background: var(--surface);
+    padding: 40px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .counter-cell::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--lime), transparent);
+    transform: scaleX(0);
+    transition: transform 0.6s ease;
+  }
+
+  .counter-cell:hover::after { transform: scaleX(1); }
+
+  .counter-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.2rem;
+    color: var(--lime);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .counter-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 300;
+    line-height: 1.4;
+  }
+
+  .benefits-list {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .benefit-item {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+
+  .benefit-icon-wrap {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    background: rgba(200,241,53,0.08);
+    border: 1px solid rgba(200,241,53,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+
+  .benefit-title {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+
+  .benefit-desc {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  /* ── TESTIMONIALS ── */
+  #testimonials { background: var(--ink); }
+
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+  }
+
+  .testimonial-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px 32px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s, border-color 0.3s;
+  }
+
+  .testimonial-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(200,241,53,0.2);
+  }
+
+  .testimonial-card::before {
+    content: '"';
+    position: absolute;
+    top: 16px; right: 24px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 6rem;
+    color: rgba(200,241,53,0.06);
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .testimonial-stars {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+  }
+
+  .testimonial-text {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.75;
+    font-weight: 300;
+    margin-bottom: 28px;
+    font-style: italic;
+  }
+
+  .testimonial-user {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .testimonial-avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    color: var(--ink);
+    flex-shrink: 0;
+  }
+
+  .testimonial-name { font-weight: 600; font-size: 0.95rem; }
+  .testimonial-role { font-size: 0.8rem; color: var(--text-dim); margin-top: 2px; }
+
+  /* ── PRICING ── */
+  #pricing { background: var(--surface); }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    align-items: start;
+  }
+
+  .pricing-card {
+    background: var(--ink);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 40px 32px;
+    position: relative;
+    transition: transform 0.3s, border-color 0.3s;
+  }
+
+  .pricing-card:hover { transform: translateY(-4px); }
+
+  .pricing-card.popular {
+    background: linear-gradient(160deg, #12121f, #0f1a12);
+    border: 2px solid var(--lime);
+    box-shadow: var(--glow-lime);
+  }
+
+  .popular-badge {
+    position: absolute;
+    top: -12px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--lime);
+    color: var(--ink);
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 4px 16px;
+    border-radius: 50px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .pricing-plan {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--lime);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 20px;
+  }
+
+  .pricing-price {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+
+  .price-currency { font-size: 1.5rem; font-weight: 300; color: var(--text-muted); }
+  .price-amount { font-family: 'Bebas Neue', sans-serif; font-size: 4rem; color: var(--text); line-height: 1; }
+  .price-period { font-size: 0.85rem; color: var(--text-dim); }
+
+  .pricing-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+    font-weight: 300;
+    line-height: 1.6;
+  }
+
+  .pricing-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 36px;
+  }
+
+  .pricing-features li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  .pricing-features li::before {
+    content: '✓';
+    color: var(--lime);
+    font-size: 0.8rem;
+    font-weight: 700;
+    width: 18px; height: 18px;
+    background: rgba(200,241,53,0.1);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .pricing-features li.disabled { opacity: 0.35; }
+  .pricing-features li.disabled::before { content: '×'; color: var(--text-dim); background: rgba(255,255,255,0.05); }
+
+  .btn-pricing {
+    display: block;
+    text-align: center;
+    padding: 14px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.25s;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    border: none;
+    width: 100%;
+  }
+
+  .btn-pricing-outline {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .btn-pricing-outline:hover {
+    border-color: rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.04);
+  }
+
+  .btn-pricing-filled {
+    background: var(--lime);
+    color: var(--ink);
+  }
+
+  .btn-pricing-filled:hover {
+    background: #fff;
+    box-shadow: var(--glow-lime);
+    transform: translateY(-1px);
+  }
+
+  /* ── FAQ ── */
+  #faq { background: var(--ink); }
+
+  .faq-wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .faq-item {
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .faq-item:last-child { border-bottom: none; }
+
+  .faq-question {
+    width: 100%;
+    padding: 24px 28px;
+    background: none;
+    border: none;
+    color: var(--text);
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    font-size: 1rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .faq-question:hover { color: var(--lime); }
+
+  .faq-icon {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.3s;
+    font-size: 1rem;
+    color: var(--lime);
+  }
+
+  .faq-item.open .faq-icon {
+    background: var(--lime);
+    color: var(--ink);
+    border-color: var(--lime);
+    transform: rotate(45deg);
+  }
+
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.4s ease;
+  }
+
+  .faq-item.open .faq-answer { max-height: 300px; }
+
+  .faq-answer-inner {
+    padding: 0 28px 24px;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.75;
+    font-weight: 300;
+  }
+
+  /* ── CONTACT ── */
+  #contact { background: var(--surface); }
+
+  .contact-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 80px;
+    align-items: start;
+  }
+
+  .contact-info {
+    padding-top: 8px;
+  }
+
+  .contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .contact-icon {
+    font-size: 1.3rem;
+    width: 44px; height: 44px;
+    background: rgba(200,241,53,0.08);
+    border: 1px solid rgba(200,241,53,0.15);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .contact-item-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 4px; }
+  .contact-item-val { font-size: 0.9rem; color: var(--text-muted); font-weight: 300; }
+
+  .contact-form {
+    background: var(--ink);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 44px 40px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .form-group {
+    margin-bottom: 24px;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    letter-spacing: 0.03em;
+  }
+
+  .form-input, .form-textarea {
+    width: 100%;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 13px 16px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+
+  .form-input:focus, .form-textarea:focus {
+    border-color: var(--lime);
+    box-shadow: 0 0 0 3px rgba(200,241,53,0.08);
+  }
+
+  .form-input.error, .form-textarea.error {
+    border-color: #f13535;
+    box-shadow: 0 0 0 3px rgba(241,53,53,0.08);
+  }
+
+  .form-textarea { min-height: 130px; resize: vertical; }
+
+  .form-error {
+    display: block;
+    font-size: 0.78rem;
+    color: #f13535;
+    margin-top: 6px;
+    min-height: 18px;
+  }
+
+  .btn-submit {
+    background: var(--lime);
+    color: var(--ink);
+    border: none;
+    padding: 14px 36px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: 0.02em;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-submit:hover {
+    background: #fff;
+    box-shadow: var(--glow-lime);
+    transform: translateY(-2px);
+  }
+
+  .form-success {
+    display: none;
+    text-align: center;
+    padding: 48px 0;
+  }
+
+  .form-success-icon { font-size: 3rem; margin-bottom: 16px; }
+  .form-success-title { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--lime); letter-spacing: 1px; margin-bottom: 8px; }
+  .form-success-text { color: var(--text-muted); font-size: 0.95rem; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--ink);
+    border-top: 1px solid var(--border);
+    padding: 64px 5% 32px;
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 60px;
+    margin-bottom: 60px;
+  }
+
+  .footer-brand-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    color: var(--lime);
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+
+  .footer-brand-name span { color: var(--text); }
+
+  .footer-brand-desc {
+    font-size: 0.875rem;
+    color: var(--text-dim);
+    line-height: 1.7;
+    font-weight: 300;
+    margin-bottom: 28px;
+    max-width: 280px;
+  }
+
+  .footer-social {
+    display: flex;
+    gap: 10px;
+  }
+
+  .social-link {
+    width: 38px; height: 38px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    text-decoration: none;
+    color: var(--text-muted);
+    transition: all 0.2s;
+  }
+
+  .social-link:hover {
+    background: rgba(200,241,53,0.1);
+    border-color: rgba(200,241,53,0.3);
+    color: var(--lime);
+    transform: translateY(-2px);
+  }
+
+  .footer-heading {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 1px;
+    font-size: 1.1rem;
+    color: var(--text);
+    margin-bottom: 20px;
+  }
+
+  .footer-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .footer-links a {
+    text-decoration: none;
+    font-size: 0.875rem;
+    color: var(--text-dim);
+    transition: color 0.2s;
+  }
+
+  .footer-links a:hover { color: var(--lime); }
+
+  .footer-bottom {
+    border-top: 1px solid var(--border);
+    padding-top: 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: gap;
+    gap: 16px;
+  }
+
+  .footer-copy {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+  }
+
+  .footer-copy span { color: var(--lime); }
+
+  .footer-legal {
+    display: flex;
+    gap: 24px;
+  }
+
+  .footer-legal a {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-legal a:hover { color: var(--text-muted); }
+
+  /* ── REVEAL ANIMATIONS ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .reveal-left {
+    opacity: 0;
+    transform: translateX(-30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .reveal-left.visible { opacity: 1; transform: translateX(0); }
+
+  .reveal-right {
+    opacity: 0;
+    transform: translateX(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+  .delay-1 { transition-delay: 0.1s; }
+  .delay-2 { transition-delay: 0.2s; }
+  .delay-3 { transition-delay: 0.3s; }
+  .delay-4 { transition-delay: 0.4s; }
+  .delay-5 { transition-delay: 0.5s; }
+
+  /* ── MOBILE MENU ── */
+  .mobile-menu {
+    position: fixed;
+    top: 72px; left: 0; right: 0;
+    background: rgba(10,10,15,0.97);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 24px 5%;
+    z-index: 800;
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    transform: translateY(-10px);
+    opacity: 0;
+    transition: all 0.3s;
+  }
+
+  .mobile-menu.open {
+    display: flex;
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .mobile-menu a {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    transition: color 0.2s;
+    display: block;
+  }
+
+  .mobile-menu a:hover { color: var(--lime); }
+  .mobile-menu a:last-child { border-bottom: none; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1100px) {
+    .benefits-layout { grid-template-columns: 1fr; gap: 48px; }
+    .contact-layout { grid-template-columns: 1fr; gap: 48px; }
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+    .hero-visual { display: none; }
+  }
+
+  @media (max-width: 768px) {
+    section { padding: 72px 5%; }
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+    .hero-title { font-size: clamp(3rem, 12vw, 5.5rem); }
+    .counters-grid { grid-template-columns: 1fr 1fr; }
+    .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+    .form-row { grid-template-columns: 1fr; }
+    .contact-form { padding: 32px 24px; }
+    .screens-wrap { gap: 16px; }
+    .phone-mockup { width: 180px; }
+    .phone-mockup.center { transform: translateY(-20px) scale(1.05); }
+  }
+
+  @media (max-width: 480px) {
+    .hero-stats { gap: 28px; }
+    .counters-grid { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">FIT<span>PULSE</span></a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#screens">App</a></li>
+    <li><a href="#benefits">Benefits</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#contact" class="nav-cta">Get Started</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-menu" id="mobile-menu">
+  <a href="#features" onclick="closeMobile()">Features</a>
+  <a href="#screens" onclick="closeMobile()">App Preview</a>
+  <a href="#benefits" onclick="closeMobile()">Benefits</a>
+  <a href="#testimonials" onclick="closeMobile()">Testimonials</a>
+  <a href="#pricing" onclick="closeMobile()">Pricing</a>
+  <a href="#faq" onclick="closeMobile()">FAQ</a>
+  <a href="#contact" onclick="closeMobile()">Get Started →</a>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-orb hero-orb-1"></div>
+  <div class="hero-orb hero-orb-2"></div>
+
+  <div class="hero-content">
+    <div class="hero-badge">Now Available — v2.0</div>
+    <h1 class="hero-title">
+      Transform
+      <span>Your Fitness</span>
+      Journey
+    </h1>
+    <p class="hero-desc">Track workouts, set powerful goals, and build healthy habits that last. FitPulse gives you the data-driven edge to become the best version of yourself.</p>
+    <div class="hero-btns">
+      <a href="#contact" class="btn-primary">Get Started →</a>
+      <a href="#screens" class="btn-secondary">▶ See App Preview</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="hero-stat-num">10K+</span>
+        <span class="hero-stat-label">Active Users</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">500K+</span>
+        <span class="hero-stat-label">Workouts Logged</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">95%</span>
+        <span class="hero-stat-label">Satisfaction</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-header reveal">
+    <div class="section-label">Core Features</div>
+    <h2 class="section-title">Everything You Need</h2>
+    <p class="section-desc">A complete fitness ecosystem designed to keep you motivated, consistent, and progressing.</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card reveal delay-1">
+      <span class="feature-icon">🏋️</span>
+      <h3 class="feature-title">Workout Tracking</h3>
+      <p class="feature-desc">Log every rep, set, and exercise with precision. Build custom routines and track performance over time with detailed history.</p>
+      <span class="feature-tag">Core</span>
+    </div>
+    <div class="feature-card reveal delay-2">
+      <span class="feature-icon">🎯</span>
+      <h3 class="feature-title">Goal Setting</h3>
+      <p class="feature-desc">Define meaningful targets — weight, strength, endurance — and follow a structured path to hit them with milestone tracking.</p>
+      <span class="feature-tag">Guided</span>
+    </div>
+    <div class="feature-card reveal delay-3">
+      <span class="feature-icon">📊</span>
+      <h3 class="feature-title">Progress Analytics</h3>
+      <p class="feature-desc">Visualise your gains with rich charts and insights. See trends, personal records, and volume data at a glance.</p>
+      <span class="feature-tag">Insights</span>
+    </div>
+    <div class="feature-card reveal delay-1">
+      <span class="feature-icon">🥗</span>
+      <h3 class="feature-title">Nutrition Monitoring</h3>
+      <p class="feature-desc">Log meals, track macros, and sync caloric goals with your training schedule. A database of 1M+ foods included.</p>
+      <span class="feature-tag">Pro</span>
+    </div>
+    <div class="feature-card reveal delay-2">
+      <span class="feature-icon">⚡</span>
+      <h3 class="feature-title">Daily Challenges</h3>
+      <p class="feature-desc">Stay engaged with fresh daily and weekly challenges that push your limits and earn you achievements and rewards.</p>
+      <span class="feature-tag">Gamified</span>
+    </div>
+    <div class="feature-card reveal delay-3">
+      <span class="feature-icon">🤝</span>
+      <h3 class="feature-title">Community Support</h3>
+      <p class="feature-desc">Connect with athletes worldwide. Share progress, join team challenges, and get encouragement when you need it most.</p>
+      <span class="feature-tag">Social</span>
+    </div>
+  </div>
+</section>
+
+<!-- SCREENS -->
+<section id="screens">
+  <div class="section-header reveal" style="text-align:center; max-width:600px; margin:0 auto 0;">
+    <div class="section-label" style="justify-content:center;">App Preview</div>
+    <h2 class="section-title">Beautifully Designed</h2>
+    <p class="section-desc" style="margin:0 auto;">Every screen crafted for clarity, speed, and motivation.</p>
+  </div>
+  <div class="screens-wrap">
+    <!-- Dashboard -->
+    <div class="phone-mockup reveal reveal-left delay-1">
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="phone-screen screen-dashboard">
+          <div class="screen-header">
+            <div>
+              <div class="screen-greeting">Good Morning</div>
+              <div class="screen-name">Alex Johnson</div>
+            </div>
+            <div class="screen-avatar"></div>
+          </div>
+          <div class="screen-hero-card">
+            <div class="screen-card-label">Today's Goal</div>
+            <div class="screen-card-val">8,420</div>
+            <div class="screen-card-sub">Steps · 84% of daily target</div>
+          </div>
+          <div class="screen-mini-grid">
+            <div class="screen-mini-card">
+              <div class="screen-mini-icon">🔥</div>
+              <div class="screen-mini-val">642</div>
+              <div class="screen-mini-label">Calories Burned</div>
+            </div>
+            <div class="screen-mini-card">
+              <div class="screen-mini-icon">💧</div>
+              <div class="screen-mini-val">1.8L</div>
+              <div class="screen-mini-label">Water Intake</div>
+            </div>
+            <div class="screen-mini-card">
+              <div class="screen-mini-icon">😴</div>
+              <div class="screen-mini-val">7h 40m</div>
+              <div class="screen-mini-label">Sleep Last Night</div>
+            </div>
+            <div class="screen-mini-card">
+              <div class="screen-mini-icon">💪</div>
+              <div class="screen-mini-val">3/5</div>
+              <div class="screen-mini-label">Workouts This Week</div>
+            </div>
+          </div>
+          <div class="screen-bar-wrap">
+            <div class="screen-bar-label"><span class="screen-bar-title">Protein</span><span class="screen-bar-val">128g</span></div>
+            <div class="screen-bar-track"><div class="screen-bar-fill" style="width:72%;background:var(--lime)"></div></div>
+          </div>
+          <div class="screen-bar-wrap">
+            <div class="screen-bar-label"><span class="screen-bar-title">Carbs</span><span class="screen-bar-val">210g</span></div>
+            <div class="screen-bar-track"><div class="screen-bar-fill" style="width:58%;background:var(--cyan)"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-label">Dashboard</div>
+    </div>
+
+    <!-- Workout -->
+    <div class="phone-mockup center reveal delay-2">
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="phone-screen screen-workout">
+          <div class="workout-header">
+            <div class="workout-timer">32:14</div>
+            <div class="workout-timer-label">Push Day · In Progress</div>
+          </div>
+          <div class="exercise-list">
+            <div class="exercise-item active">
+              <div class="ex-icon">🏋️</div>
+              <div>
+                <div class="ex-name">Bench Press</div>
+                <div class="ex-sets">4 × 8 · 80kg</div>
+              </div>
+              <div class="ex-check done">✓</div>
+            </div>
+            <div class="exercise-item active">
+              <div class="ex-icon">💪</div>
+              <div>
+                <div class="ex-name">Incline DB Press</div>
+                <div class="ex-sets">3 × 10 · 30kg</div>
+              </div>
+              <div class="ex-check done">✓</div>
+            </div>
+            <div class="exercise-item">
+              <div class="ex-icon">🔄</div>
+              <div>
+                <div class="ex-name">Cable Flyes</div>
+                <div class="ex-sets">3 × 12 · 20kg</div>
+              </div>
+              <div class="ex-check"></div>
+            </div>
+            <div class="exercise-item">
+              <div class="ex-icon">🦾</div>
+              <div>
+                <div class="ex-name">Tricep Pushdown</div>
+                <div class="ex-sets">4 × 15 · 25kg</div>
+              </div>
+              <div class="ex-check"></div>
+            </div>
+            <div class="exercise-item">
+              <div class="ex-icon">⬆️</div>
+              <div>
+                <div class="ex-name">Overhead Press</div>
+                <div class="ex-sets">3 × 8 · 50kg</div>
+              </div>
+              <div class="ex-check"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-label">Workout Tracker</div>
+    </div>
+
+    <!-- Progress -->
+    <div class="phone-mockup reveal reveal-right delay-3">
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="phone-screen screen-progress">
+          <div class="screen-header">
+            <div>
+              <div class="screen-greeting">This Month</div>
+              <div class="screen-name">Progress Stats</div>
+            </div>
+            <div style="font-size:1.2rem">📈</div>
+          </div>
+          <div class="progress-chart-wrap">
+            <div class="chart-label">Weekly Workouts</div>
+            <div class="mini-chart">
+              <div class="chart-bar" style="height:40%"></div>
+              <div class="chart-bar" style="height:65%"></div>
+              <div class="chart-bar" style="height:50%"></div>
+              <div class="chart-bar" style="height:80%"></div>
+              <div class="chart-bar" style="height:55%"></div>
+              <div class="chart-bar" style="height:90%"></div>
+              <div class="chart-bar highlight" style="height:75%"></div>
+            </div>
+          </div>
+          <div class="ring-stats">
+            <div class="ring-stat">
+              <div class="ring ring-1">78%</div>
+              <div class="ring-name">Steps</div>
+            </div>
+            <div class="ring-stat">
+              <div class="ring ring-2">60%</div>
+              <div class="ring-name">Calories</div>
+            </div>
+            <div class="ring-stat">
+              <div class="ring ring-3">91%</div>
+              <div class="ring-name">Workouts</div>
+            </div>
+          </div>
+          <div style="margin-top:16px">
+            <div class="screen-bar-wrap">
+              <div class="screen-bar-label"><span class="screen-bar-title">Bench Press PR</span><span class="screen-bar-val">+12kg</span></div>
+              <div class="screen-bar-track"><div class="screen-bar-fill" style="width:85%;background:var(--magenta)"></div></div>
+            </div>
+            <div class="screen-bar-wrap">
+              <div class="screen-bar-label"><span class="screen-bar-title">Squat PR</span><span class="screen-bar-val">+18kg</span></div>
+              <div class="screen-bar-track"><div class="screen-bar-fill" style="width:90%;background:var(--lime)"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-label">Progress Statistics</div>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFITS -->
+<section id="benefits">
+  <div class="benefits-layout">
+    <div class="reveal-left">
+      <div class="section-label">Why FitPulse</div>
+      <h2 class="section-title">Built for Results</h2>
+      <p class="section-desc" style="margin-bottom:48px">The numbers speak for themselves. Join thousands of athletes already transforming their lives.</p>
+      <div class="counters-grid">
+        <div class="counter-cell">
+          <div class="counter-num" data-target="10000" data-suffix="K+">0</div>
+          <div class="counter-label">Active users trusting FitPulse</div>
+        </div>
+        <div class="counter-cell">
+          <div class="counter-num" data-target="500" data-suffix="K+">0</div>
+          <div class="counter-label">Workouts logged on the platform</div>
+        </div>
+        <div class="counter-cell">
+          <div class="counter-num" data-target="95" data-suffix="%">0</div>
+          <div class="counter-label">User satisfaction rating</div>
+        </div>
+        <div class="counter-cell">
+          <div class="counter-num" data-target="50" data-suffix="+">0</div>
+          <div class="counter-label">Expert workout plans included</div>
+        </div>
+      </div>
+    </div>
+    <div class="benefits-list reveal-right">
+      <div class="benefit-item">
+        <div class="benefit-icon-wrap">⚡</div>
+        <div>
+          <div class="benefit-title">Instant Performance Insights</div>
+          <div class="benefit-desc">Real-time feedback on your workouts. See exactly how each session contributes to your long-term progress with AI-powered analysis.</div>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon-wrap">🧠</div>
+        <div>
+          <div class="benefit-title">Smart Adaptive Programming</div>
+          <div class="benefit-desc">Your plan evolves as you do. FitPulse intelligently adjusts intensity, volume, and recovery based on your actual performance data.</div>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon-wrap">📱</div>
+        <div>
+          <div class="benefit-title">Seamless Cross-Device Sync</div>
+          <div class="benefit-desc">Start a workout on your phone, review analytics on your tablet. Your data stays perfectly synced across all your devices in real time.</div>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon-wrap">🔒</div>
+        <div>
+          <div class="benefit-title">Private & Secure by Design</div>
+          <div class="benefit-desc">Your health data is yours alone. End-to-end encryption and strict privacy controls ensure your personal information stays protected.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="section-header reveal" style="text-align:center; max-width:560px; margin:0 auto 64px;">
+    <div class="section-label" style="justify-content:center;">Testimonials</div>
+    <h2 class="section-title">Real People. Real Results.</h2>
+    <p class="section-desc" style="margin:0 auto">Thousands of athletes have transformed their fitness with FitPulse.</p>
+  </div>
+  <div class="testimonials-grid">
+    <div class="testimonial-card reveal delay-1">
+      <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+      <p class="testimonial-text">"FitPulse completely changed how I approach training. The analytics helped me spot patterns I never noticed before — I hit a 30kg squat PR in just 3 months."</p>
+      <div class="testimonial-user">
+        <div class="testimonial-avatar" style="background:linear-gradient(135deg,var(--lime),var(--cyan))">MR</div>
+        <div>
+          <div class="testimonial-name">Marcus Reed</div>
+          <div class="testimonial-role">Powerlifter · 2 years with FitPulse</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card reveal delay-2">
+      <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+      <p class="testimonial-text">"As a busy mum of two, I needed something that fits into real life. FitPulse's daily challenges and quick-win workouts keep me consistent even on the craziest days."</p>
+      <div class="testimonial-user">
+        <div class="testimonial-avatar" style="background:linear-gradient(135deg,var(--magenta),#f19035)">SP</div>
+        <div>
+          <div class="testimonial-name">Sarah Park</div>
+          <div class="testimonial-role">HIIT Enthusiast · 14 months with FitPulse</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card reveal delay-3">
+      <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+      <p class="testimonial-text">"The nutrition tracking is the best I've found. The macro syncing with my training load is game-changing — I finally understand what to eat and when for optimal performance."</p>
+      <div class="testimonial-user">
+        <div class="testimonial-avatar" style="background:linear-gradient(135deg,var(--cyan),#358ef1)">JT</div>
+        <div>
+          <div class="testimonial-name">James Torres</div>
+          <div class="testimonial-role">Triathlete · 3 years with FitPulse</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="section-header reveal" style="text-align:center; max-width:560px; margin:0 auto 64px;">
+    <div class="section-label" style="justify-content:center;">Pricing</div>
+    <h2 class="section-title">Simple, Honest Plans</h2>
+    <p class="section-desc" style="margin:0 auto">No hidden fees. No gimmicks. Cancel anytime.</p>
+  </div>
+  <div class="pricing-grid">
+    <div class="pricing-card reveal delay-1">
+      <div class="pricing-plan">Basic</div>
+      <div class="pricing-price">
+        <span class="price-currency">$</span>
+        <span class="price-amount">0</span>
+        <span class="price-period">/ forever</span>
+      </div>
+      <p class="pricing-desc">Everything you need to get started on your fitness journey. No credit card required.</p>
+      <ul class="pricing-features">
+        <li>Basic workout logging</li>
+        <li>3 workout templates</li>
+        <li>7-day history</li>
+        <li>Step tracking</li>
+        <li class="disabled">Advanced analytics</li>
+        <li class="disabled">Nutrition monitoring</li>
+        <li class="disabled">Community access</li>
+        <li class="disabled">AI programming</li>
+      </ul>
+      <button class="btn-pricing btn-pricing-outline">Start Free</button>
+    </div>
+    <div class="pricing-card popular reveal delay-2">
+      <div class="popular-badge">Most Popular</div>
+      <div class="pricing-plan">Pro</div>
+      <div class="pricing-price">
+        <span class="price-currency">$</span>
+        <span class="price-amount">12</span>
+        <span class="price-period">/ month</span>
+      </div>
+      <p class="pricing-desc">For serious athletes who want the full data-driven experience and smart programming.</p>
+      <ul class="pricing-features">
+        <li>Unlimited workout logging</li>
+        <li>50+ workout templates</li>
+        <li>Full history & analytics</li>
+        <li>Nutrition monitoring</li>
+        <li>Community access</li>
+        <li>Daily challenges</li>
+        <li>Progress photos</li>
+        <li class="disabled">AI programming</li>
+      </ul>
+      <button class="btn-pricing btn-pricing-filled">Get Pro →</button>
+    </div>
+    <div class="pricing-card reveal delay-3">
+      <div class="pricing-plan">Premium</div>
+      <div class="pricing-price">
+        <span class="price-currency">$</span>
+        <span class="price-amount">29</span>
+        <span class="price-period">/ month</span>
+      </div>
+      <p class="pricing-desc">The ultimate performance toolkit with AI coaching, priority support, and everything in Pro.</p>
+      <ul class="pricing-features">
+        <li>Everything in Pro</li>
+        <li>AI adaptive programming</li>
+        <li>1:1 coach consultation</li>
+        <li>Advanced body metrics</li>
+        <li>Priority support (24h)</li>
+        <li>Early feature access</li>
+        <li>Custom meal plans</li>
+        <li>Wearable integrations</li>
+      </ul>
+      <button class="btn-pricing btn-pricing-outline">Go Premium</button>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="section-header reveal" style="text-align:center; max-width:560px; margin:0 auto 64px;">
+    <div class="section-label" style="justify-content:center;">FAQ</div>
+    <h2 class="section-title">Questions Answered</h2>
+    <p class="section-desc" style="margin:0 auto">Everything you need to know before getting started.</p>
+  </div>
+  <div class="faq-wrap reveal">
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFAQ(this)">
+        Can I use FitPulse without any gym equipment?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer">
+        <p class="faq-answer-inner">Absolutely. FitPulse includes hundreds of bodyweight routines, HIIT programs, yoga flows, and outdoor workouts that require zero equipment. Whether you're at home, travelling, or in the park, you'll always have a great workout option available.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFAQ(this)">
+        How does the AI adaptive programming work?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer">
+        <p class="faq-answer-inner">Our Premium AI engine analyses your logged workouts, recovery metrics, and goal trajectory to automatically adjust your upcoming sessions. If you're recovering well, it may add volume. If you're fatigued, it de-loads intelligently. The result is optimal progression without burnout — available on the Premium plan.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFAQ(this)">
+        Is my health data kept private and secure?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer">
+        <p class="faq-answer-inner">Security is our top priority. All your health and workout data is encrypted in transit and at rest using AES-256 encryption. We never sell your data to third parties, and you can export or delete your account and all associated data at any time from your settings.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFAQ(this)">
+        Can I switch between plans or cancel at any time?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer">
+        <p class="faq-answer-inner">Yes, completely. You can upgrade, downgrade, or cancel your subscription at any time with no penalties. If you cancel a paid plan, you'll retain access until the end of your current billing period, then revert to the free Basic plan. Your data is never deleted when you change plans.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFAQ(this)">
+        Which wearable devices does FitPulse support?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer">
+        <p class="faq-answer-inner">FitPulse integrates with Apple Watch, Garmin, Fitbit, Whoop, Polar, and all Google Fit/Apple Health compatible devices on the Premium plan. Heart rate, HRV, sleep scores, and activity data all sync automatically to give you a complete picture of your health and performance.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFAQ(this)">
+        Is there a free trial for the paid plans?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer">
+        <p class="faq-answer-inner">Yes — both Pro and Premium plans come with a 14-day free trial, no credit card required. Explore all features fully before committing. After the trial, you'll be prompted to enter payment details to continue, or you'll automatically move to the free Basic plan if you choose not to subscribe.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-layout">
+    <div class="contact-info reveal-left">
+      <div class="section-label">Get in Touch</div>
+      <h2 class="section-title" style="margin-bottom:24px">Let's Talk</h2>
+      <p class="section-desc" style="margin-bottom:48px">Have questions? Want a demo for your gym or team? Our team responds within 24 hours.</p>
+      <div class="contact-item">
+        <div class="contact-icon">📧</div>
+        <div>
+          <div class="contact-item-title">Email</div>
+          <div class="contact-item-val">hello@fitpulse.app</div>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon">💬</div>
+        <div>
+          <div class="contact-item-title">Live Chat</div>
+          <div class="contact-item-val">Available Mon–Fri, 9am–6pm EST</div>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon">🌍</div>
+        <div>
+          <div class="contact-item-title">Global</div>
+          <div class="contact-item-val">Available in 45+ countries</div>
+        </div>
+      </div>
+    </div>
+    <div class="reveal-right">
+      <div class="contact-form" id="contact-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="name">Full Name</label>
+            <input class="form-input" type="text" id="name" placeholder="Alex Johnson">
+            <span class="form-error" id="name-error"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="email">Email Address</label>
+            <input class="form-input" type="email" id="email" placeholder="alex@email.com">
+            <span class="form-error" id="email-error"></span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="subject">Subject</label>
+          <input class="form-input" type="text" id="subject" placeholder="How can we help?">
+          <span class="form-error" id="subject-error"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="message">Message</label>
+          <textarea class="form-textarea" id="message" placeholder="Tell us more about what you need..."></textarea>
+          <span class="form-error" id="message-error"></span>
+        </div>
+        <button class="btn-submit" onclick="submitForm()">Send Message →</button>
+      </div>
+      <div class="form-success" id="form-success">
+        <div class="form-success-icon">✅</div>
+        <div class="form-success-title">Message Sent!</div>
+        <p class="form-success-text">Thanks for reaching out. We'll get back to you within 24 hours.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand-name">FIT<span>PULSE</span></div>
+      <p class="footer-brand-desc">The modern fitness platform for athletes who take their training seriously. Track, analyse, and dominate your goals.</p>
+      <div class="footer-social">
+        <a href="#" class="social-link" aria-label="Twitter">𝕏</a>
+        <a href="#" class="social-link" aria-label="Instagram">📸</a>
+        <a href="#" class="social-link" aria-label="YouTube">▶</a>
+        <a href="#" class="social-link" aria-label="LinkedIn">in</a>
+        <a href="#" class="social-link" aria-label="TikTok">♪</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-heading">Product</div>
+      <ul class="footer-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#screens">App Preview</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#">Changelog</a></li>
+        <li><a href="#">Roadmap</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-heading">Company</div>
+      <ul class="footer-links">
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Press Kit</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-heading">Support</div>
+      <ul class="footer-links">
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#">Help Center</a></li>
+        <li><a href="#">API Docs</a></li>
+        <li><a href="#">Status</a></li>
+        <li><a href="#">Community</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2025 <span>FitPulse</span>. All rights reserved. Built with ❤️ for athletes.</div>
+    <div class="footer-legal">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Cookie Policy</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ── NAV SCROLL ──
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 20);
+  });
+
+  // ── HAMBURGER ──
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobile-menu');
+
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+  });
+
+  function closeMobile() {
+    hamburger.classList.remove('open');
+    mobileMenu.classList.remove('open');
+  }
+
+  // ── FAQ ACCORDION ──
+  function toggleFAQ(btn) {
+    const item = btn.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+
+  // ── SCROLL REVEAL ──
+  const revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+
+  const revealObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        revealObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  revealEls.forEach(el => revealObs.observe(el));
+
+  // ── COUNTER ANIMATION ──
+  function animateCounter(el) {
+    const target = parseInt(el.dataset.target);
+    const suffix = el.dataset.suffix || '';
+    const duration = 1800;
+    const steps = 60;
+    const increment = target / steps;
+    let current = 0;
+    let count = 0;
+
+    const timer = setInterval(() => {
+      count++;
+      current = Math.min(Math.round(increment * count), target);
+
+      if (target >= 10000) {
+        el.textContent = (current / 1000).toFixed(0) + 'K' + suffix.replace('K+', '+');
+      } else {
+        el.textContent = current + suffix;
+      }
+
+      if (count >= steps) {
+        clearInterval(timer);
+        if (target >= 10000) {
+          el.textContent = (target / 1000) + 'K+';
+        } else {
+          el.textContent = target + suffix;
+        }
+      }
+    }, duration / steps);
+  }
+
+  const counterEls = document.querySelectorAll('.counter-num[data-target]');
+  const counterObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting && !e.target.dataset.animated) {
+        e.target.dataset.animated = 'true';
+        animateCounter(e.target);
+        counterObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  counterEls.forEach(el => counterObs.observe(el));
+
+  // ── FORM VALIDATION ──
+  function validateField(id, errorId, rule) {
+    const el = document.getElementById(id);
+    const err = document.getElementById(errorId);
+    const valid = rule(el.value.trim());
+    if (!valid.ok) {
+      el.classList.add('error');
+      err.textContent = valid.msg;
+      return false;
+    }
+    el.classList.remove('error');
+    err.textContent = '';
+    return true;
+  }
+
+  ['name', 'email', 'subject', 'message'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', () => {
+      el.classList.remove('error');
+      const errEl = document.getElementById(id + '-error');
+      if (errEl) errEl.textContent = '';
+    });
+  });
+
+  function submitForm() {
+    const rules = [
+      ['name', 'name-error', v => v.length >= 2 ? {ok:true} : {ok:false, msg:'Please enter your full name.'}],
+      ['email', 'email-error', v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? {ok:true} : {ok:false, msg:'Please enter a valid email address.'}],
+      ['subject', 'subject-error', v => v.length >= 3 ? {ok:true} : {ok:false, msg:'Please enter a subject.'}],
+      ['message', 'message-error', v => v.length >= 20 ? {ok:true} : {ok:false, msg:'Message must be at least 20 characters.'}],
+    ];
+
+    const valid = rules.every(([id, errId, rule]) => validateField(id, errId, rule));
+
+    if (valid) {
+      document.getElementById('contact-form').style.display = 'none';
+      document.getElementById('form-success').style.display = 'block';
+    }
+  }
+
+  // ── SMOOTH SCROLL FOR NAV ──
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+</script>
+</body>
+</html>
